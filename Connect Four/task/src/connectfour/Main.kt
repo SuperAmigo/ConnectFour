@@ -73,8 +73,19 @@ fun main() {
             } else {
                 if (firstPlayerTurn) mList[rows - 1 - countCols][turn - 1] = "o"
                 else mList[rows - 1 - countCols][turn - 1] = "*"
-                firstPlayerTurn = !firstPlayerTurn
                 drawBoard(rows, columns)
+                if (isBoardFull(rows, columns)) {
+                    println("It is a draw")
+                    read = "end"
+                }
+                else if (checkHorizontalWinner() || checkVerticalWinner(columns)
+                    || checkDiagonalWinner(rows, columns) || checkReverseDiagonalWinner(rows, columns)) {
+                    println(if (firstPlayerTurn) "Player $namePlayer1 won" else "Player $namePlayer2 won")
+                    read = "end"
+                } else {
+                    firstPlayerTurn = !firstPlayerTurn
+                }
+
             }
         }
     } while (read != "end")
@@ -127,4 +138,184 @@ fun countColumnIsFull (row: Int, turn: Int): Int {
         if (mList[i][turn - 1] == "*" || mList[i][turn - 1] == "o") countForColumn++
     }
     return countForColumn
+}
+
+fun checkHorizontalWinner(): Boolean {
+    for (i in mList.size - 1 downTo 0) {
+        var count1 = 0
+        var count2 = 0
+        var currentDiscIsO = true
+        for (j in mList[i]) {
+            when (j){
+                " " -> continue
+                "o" -> if (currentDiscIsO) count1++
+                else {
+                    count1++
+                    count2 = 0
+                    currentDiscIsO = true
+                }
+                "*" -> if (!currentDiscIsO) count2++
+                else {
+                    count2++
+                    count1 = 0
+                    currentDiscIsO = false
+                }
+            }
+            if (count1 == 4 || count2 == 4)
+                return true
+        }
+    }
+    return false
+}
+
+fun checkVerticalWinner(columns: Int): Boolean {
+    for (i in 0 until columns) {
+        var count1 = 0
+        var count2 = 0
+        var currentDiscIsO = true
+        for (j in mList.size - 1 downTo 0) {
+            when (mList[j][i]){
+                " " -> continue
+                "o" -> if (currentDiscIsO) count1++
+                else {
+                    count1++
+                    count2 = 0
+                    currentDiscIsO = true
+                }
+                "*" -> if (!currentDiscIsO) count2++
+                else {
+                    count2++
+                    count1 = 0
+                    currentDiscIsO = false
+                }
+            }
+            if (count1 == 4 || count2 == 4)
+                return true
+        }
+    }
+    return false
+}
+
+fun checkDiagonalWinner(rows: Int, columns: Int): Boolean {
+
+    val diagonals = rows + columns - 1
+    for (i in 0 until diagonals) {
+        var count1 = 0
+        var count2 = 0
+        var currentDiscIsO = true
+        if (i < rows) {
+            var row = i
+            var column = 0
+            while (row >= 0) {
+                when (mList[row--][column++]){
+                    " " -> continue
+                    "o" -> if (currentDiscIsO) count1++
+                    else {
+                        count1++
+                        count2 = 0
+                        currentDiscIsO = true
+                    }
+                    "*" -> if (!currentDiscIsO) count2++
+                    else {
+                        count2++
+                        count1 = 0
+                        currentDiscIsO = false
+                    }
+                }
+                if (count1 == 4 || count2 == 4)
+                    return true
+            }
+        } else {
+            var row = rows - 1
+            var colum = i - rows + 1
+            while (colum < columns && row >= 0) {
+                when (mList[row--][colum++]) {
+                    " " -> continue
+                    "o" -> if (currentDiscIsO) count1++
+                    else {
+                        count1++
+                        count2 = 0
+                        currentDiscIsO = true
+                    }
+                    "*" -> if (!currentDiscIsO) count2++
+                    else {
+                        count2++
+                        count1 = 0
+                        currentDiscIsO = false
+                    }
+                }
+                if (count1 == 4 || count2 == 4)
+                    return true
+            }
+        }
+    }
+    return false
+}
+
+fun checkReverseDiagonalWinner(rows: Int, columns: Int): Boolean {
+
+    val diagonals = rows + columns - 1
+    for (i in 0 until diagonals) {
+        var count1 = 0
+        var count2 = 0
+        var currentDiscIsO = true
+        if (i < rows) {
+            var row = i
+            var column = columns - 1
+            while (row >= 0 && column >= 0) {
+                when (mList[row--][column--]){
+                    " " -> continue
+                    "o" -> if (currentDiscIsO) count1++
+                    else {
+                        count1++
+                        count2 = 0
+                        currentDiscIsO = true
+                    }
+                    "*" -> if (!currentDiscIsO) count2++
+                    else {
+                        count2++
+                        count1 = 0
+                        currentDiscIsO = false
+                    }
+                }
+                if (count1 == 4 || count2 == 4)
+                    return true
+            }
+        } else {
+            var row = rows - 1
+            var colum = diagonals - i - 1
+            while (colum >=0 && rows > 0) {
+                when (mList[row--][colum--]) {
+                    " " -> continue
+                    "o" -> if (currentDiscIsO) count1++
+                    else {
+                        count1++
+                        count2 = 0
+                        currentDiscIsO = true
+                    }
+                    "*" -> if (!currentDiscIsO) count2++
+                    else {
+                        count2++
+                        count1 = 0
+                        currentDiscIsO = false
+                    }
+                }
+                if (count1 == 4 || count2 == 4)
+                    return true
+            }
+        }
+    }
+    return false
+}
+
+fun isBoardFull(rows: Int, columns: Int): Boolean {
+    var count = 0
+    for (i in mList.indices) {
+        for (j in mList[i].indices) {
+            if (mList[i][j] == "*" || mList[i][j] == "o")
+                count++
+        }
+    }
+
+    return count == rows * columns
 }
